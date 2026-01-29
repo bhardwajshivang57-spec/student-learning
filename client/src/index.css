@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+
+/* Global styles */
+
+
+body {
+  font-family: system-ui, Arial, sans-serif;
+}
