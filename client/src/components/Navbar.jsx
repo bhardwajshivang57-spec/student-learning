@@ -21,9 +21,13 @@ export default function Navbar() {
 
           {/* NAV LINKS – RIGHT CORNER */}
           <nav className="flex items-center gap-8 ml-auto text-sm font-medium text-gray-700">
-            <Link to="/courses" className="hover:text-blue-600">
+            <Link
+              to={user ? "/my-courses" : "/courses"}
+              className="hover:text-blue-600"
+            >
               Courses
             </Link>
+
             <Link to="/about" className="hover:text-blue-600">
               About Us
             </Link>

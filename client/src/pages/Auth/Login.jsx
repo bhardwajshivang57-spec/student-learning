@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import bgLogin from "../../assets/bglogin.jpg";
 import logo from "../../assets/logo.jpg";
 import { useAuth } from "../../context/AuthContext";
@@ -135,9 +136,13 @@ export default function Login() {
           {/* SIGN UP */}
           <p className="text-center text-sm mt-6">
             Don’t have an account?{" "}
-            <span className="text-blue-600 cursor-pointer hover:underline">
+            <Link
+              to="/register"
+              className="text-blue-600 cursor-pointer hover:underline"
+            >
               Sign Up
-            </span>
+            </Link>
+
           </p>
         </div>
       </div>
