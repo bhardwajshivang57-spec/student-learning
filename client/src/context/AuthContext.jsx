@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
-import { loginUser } from "../services/authService";
+import { loginUser, registerUser } from "../services/authService";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -10,10 +10,23 @@ export const AuthProvider = ({ children }) => {
     const res = await loginUser(data);
     setUser(res);
     localStorage.setItem("user", JSON.stringify(res));
+    return res;
+  };
+
+  const register = async (data) => {
+    const res = await registerUser(data);
+    setUser(res);
+    localStorage.setItem("user", JSON.stringify(res));
+    return res;
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

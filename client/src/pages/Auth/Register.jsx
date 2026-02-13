@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +10,9 @@ const Register = () => {
     role: "",
     terms: false,
   });
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,22 +30,34 @@ const Register = () => {
       return;
     }
 
+    if (!formData.name || !formData.email || !formData.password || !formData.role) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }
-      );
+      setLoading(true);
+      const userData = await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      });
 
       alert("Registration successful");
-      console.log(res.data);
-
+      
+      // role based redirect
+      if (userData?.role === "student") {
+        navigate("/dashboard");
+      } else if (userData?.role === "instructor") {
+        navigate("/instructor/dashboard");
+      } else {
+        navigate("/login");
+      }
     } catch (err) {
       alert(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,8 +126,12 @@ const Register = () => {
               I agree to Terms of Service & Privacy Policy
             </label>
 
-            <button className="w-full py-3 bg-blue-600 text-white rounded-full font-bold">
-              SIGN UP
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition disabled:opacity-60"
+            >
+              {loading ? "Creating Account..." : "SIGN UP"}
             </button>
           </form>
 

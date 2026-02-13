@@ -18,3 +18,9 @@ export const getCourseById = async (courseId) => {
   const res = await API.get(`/courses/${courseId}`);
   return res.data;
 };
+
+// 🔹 Create new course (TEACHER)
+export const createCourse = async (courseData) => {
+  const res = await API.post("/courses", courseData);
+  return res.data;
+};

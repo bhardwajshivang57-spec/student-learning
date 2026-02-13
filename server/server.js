@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const connectDB = require("./config/db");
 
 // routes
@@ -17,6 +18,13 @@ const app = express();
 connectDB();
 
 // middleware
+app.use(
+  cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // routes

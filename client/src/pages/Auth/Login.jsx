@@ -34,13 +34,7 @@ export default function Login() {
       });
 
       // role based redirect
-      if (userData?.role === "student") {
         navigate("/dashboard");
-      } else if (userData?.role === "instructor") {
-        navigate("/instructor/dashboard");
-      } else {
-        navigate("/");
-      }
     } catch (error) {
       alert(error?.response?.data?.message || "Login failed");
     } finally {

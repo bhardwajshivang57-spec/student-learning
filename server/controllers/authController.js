@@ -4,7 +4,7 @@ const generateToken = require("../utils/generateToken");
 // REGISTER USER
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // check all fields
     if (!name || !email || !password) {
@@ -17,11 +17,12 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // create user
+    // create user (🔥 role FIX)
     const user = await User.create({
       name,
       email,
       password,
+      role: role || "student", // 👈 THIS IS THE FIX
     });
 
     res.status(201).json({
@@ -36,23 +37,20 @@ const registerUser = async (req, res) => {
   }
 };
 
-// LOGIN USER
+// LOGIN USER (no change needed)
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check fields
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
-    // find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // match password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
