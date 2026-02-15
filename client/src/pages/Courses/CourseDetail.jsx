@@ -1,135 +1,158 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Loader from "../../../components/Loader";
-import { getCourseById } from "../../../services/courseService";
+import Loader from "../../components/Loader";
+import { getCourseById } from "../../services/courseService";
 
 export default function CourseDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setLoading(true);
-    setError("");
+    const loadCourse = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-    getCourseById(id)
-      .then((data) => {
+        const data = await getCourseById(id);
         setCourse(data);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
         setError("Failed to load course details");
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadCourse();
   }, [id]);
 
   if (loading) return <Loader />;
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center px-6">
+      <div className="min-h-screen flex flex-col items-center justify-center text-center text-white">
         <h2 className="text-2xl font-semibold mb-2">Something went wrong</h2>
-        <p className="text-gray-500 mb-6">{error}</p>
-        <Link to="/courses" className="text-blue-600 hover:underline">
-          ← Back to Courses
-        </Link>
+        <p className="text-gray-400 mb-6">{error}</p>
+        <button
+          onClick={() => navigate("/courses")}
+          className="bg-blue-600 px-6 py-2 rounded-lg"
+        >
+          Back to Courses
+        </button>
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-gray-500">Course not found</p>
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Course not found
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* HERO */}
-      <div className="bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-6 md:px-24 py-12 grid md:grid-cols-2 gap-8">
-          <div>
-            <h1 className="text-3xl font-bold">{course.title}</h1>
-            <p className="mt-2 text-gray-300">By {course.instructor}</p>
+  <div
+    className="min-h-screen bg-cover bg-center relative text-white"
+    style={{
+      backgroundImage: "url('/src/assets/dashboard-bg.png')",
+    }}
+  >
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/70"></div>
 
-            <div className="flex flex-wrap gap-2 mt-4">
-              {course.features?.map((f, i) => (
+    {/* Content */}
+    <div className="relative max-w-7xl mx-auto px-6 md:px-24 py-16">
+
+      {/* HERO SECTION */}
+      <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+
+        {/* LEFT */}
+        <div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+            {course.title}
+          </h1>
+
+          <p className="text-gray-300 mb-6 text-lg">
+            By {course.instructor?.name || "Instructor"}
+          </p>
+
+          <p className="text-gray-400 mb-8 leading-relaxed max-w-xl">
+            {course.description}
+          </p>
+
+          <div className="flex items-center gap-8 mb-8">
+            <span className="text-4xl font-bold text-blue-400">
+              ₹{course.price ?? "Free"}
+            </span>
+
+            <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-medium transition duration-300 hover:scale-105">
+              Enroll Now
+            </button>
+          </div>
+
+          {course.features?.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {course.features.map((f, i) => (
                 <span
                   key={i}
-                  className="text-sm bg-white/10 px-3 py-1 rounded-full"
+                  className="bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full text-sm"
                 >
                   {f}
                 </span>
               ))}
             </div>
+          )}
+        </div>
 
-            <div className="mt-6 flex items-center gap-4">
-              <span className="text-2xl font-bold">
-                ₹{course.price ?? "Free"}
-              </span>
-              <button className="bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700">
-                Enroll Now
-              </button>
-            </div>
-          </div>
-
+        {/* RIGHT CARD STYLE PREVIEW */}
+        <div className="rounded-2xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 p-6 shadow-xl">
           <img
-            src={course.thumbnail}
+            src={
+              course.thumbnail ||
+              "https://via.placeholder.com/600x400"
+            }
             alt={course.title}
-            className="rounded-2xl shadow-lg w-full"
+            className="rounded-xl w-full object-cover"
           />
         </div>
       </div>
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 md:px-24 py-12 grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-3">Course Description</h2>
-          <p className="text-gray-700 leading-relaxed">
-            {course.description}
-          </p>
+      {/* SYLLABUS SECTION */}
+      {course.syllabus?.length > 0 && (
+        <div className="mt-10 bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-10 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-8">
+            Course Syllabus
+          </h2>
 
-          {course.syllabus?.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3">Syllabus</h3>
-              <ul className="space-y-2">
-                {course.syllabus.map((topic, i) => (
-                  <li key={i} className="flex items-center gap-2 text-gray-700">
-                    <span className="h-2 w-2 bg-blue-600 rounded-full"></span>
-                    {topic}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <aside className="bg-white rounded-2xl p-6 shadow-sm h-fit sticky top-24">
-          <h3 className="text-lg font-semibold mb-4">This course includes</h3>
-          <ul className="space-y-2 text-gray-700">
-            {course.features?.map((f, i) => (
-              <li key={i}>✔ {f}</li>
+          <ul className="space-y-4 text-gray-300 text-lg">
+            {course.syllabus.map((topic, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-4"
+              >
+                <span className="h-3 w-3 bg-blue-500 rounded-full"></span>
+                {topic}
+              </li>
             ))}
           </ul>
+        </div>
+      )}
 
-          <button className="w-full bg-blue-600 text-white py-3 rounded-lg mt-6 hover:bg-blue-700">
-            Buy Course
-          </button>
-
-          <Link
-            to="/courses"
-            className="block text-center text-blue-600 mt-4 hover:underline"
-          >
-            ← Back to Courses
-          </Link>
-        </aside>
+      {/* Back Button */}
+      <div className="mt-12">
+        <Link
+          to="/courses"
+          className="text-blue-400 hover:text-blue-300 transition"
+        >
+          ← Back to Courses
+        </Link>
       </div>
     </div>
-  );
+  </div>
+);
 }

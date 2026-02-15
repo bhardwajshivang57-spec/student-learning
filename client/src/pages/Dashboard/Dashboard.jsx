@@ -8,20 +8,34 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const data = await courseService.getAllCourses({});
-        setCourses(data.courses || []);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    loadCourses();
-  }, []);
-
   const isTeacher =
     user?.role === "teacher" || user?.role === "instructor";
+
+ useEffect(() => {
+  const loadCourses = async () => {
+    try {
+      const data = await courseService.getAllCourses();
+
+      if (user?.role === "student") {
+        // only courses where student is enrolled
+        const enrolled = data.filter(course =>
+          course.enrolledStudents?.includes(user._id)
+        );
+        setCourses(enrolled);
+      } else {
+        // teacher sees their created courses
+        const created = data.filter(course =>
+          course.instructor?._id === user._id
+        );
+        setCourses(created);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  loadCourses();
+}, [user]);
 
   return (
     <div
@@ -30,10 +44,8 @@ const Dashboard = () => {
         backgroundImage: "url('/src/assets/dashboard-bg.png')",
       }}
     >
-      {/* overlay */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* content */}
       <div className="relative max-w-7xl mx-auto px-8 py-10 text-white">
         {/* Header */}
         <div className="mb-10">
@@ -46,24 +58,35 @@ const Dashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <StatCard label="Role" value={user?.role} emoji="🎓" />
           <StatCard
-            label={isTeacher ? "Total Courses Created" : "Total Courses"}
+            label="Role"
+            value={user?.role}
+            emoji="🎓"
+          />
+          <StatCard
+            label={
+              isTeacher
+                ? "Total Courses Created"
+                : "Total Courses"
+            }
             value={courses.length}
             emoji="📘"
           />
           <StatCard
             label="Status"
-            value={isTeacher ? "Instructor Mode" : "Learning Active"}
+            value={
+              isTeacher
+                ? "Instructor Mode"
+                : "Learning Active"
+            }
             emoji="⚡"
           />
         </div>
 
         {/* MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT MAIN */}
+          {/* LEFT PANEL */}
           <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 p-6">
-            {/* ===== TEACHER DASHBOARD ===== */}
             {isTeacher ? (
               <>
                 <div className="flex justify-between items-center mb-6">
@@ -106,11 +129,10 @@ const Dashboard = () => {
                 )}
               </>
             ) : (
-              /* ===== STUDENT DASHBOARD ===== */
               <>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">
-                    Your Courses
+                    Explore Courses
                   </h2>
                   <button
                     onClick={() => navigate("/courses")}
@@ -123,14 +145,8 @@ const Dashboard = () => {
                 {courses.length === 0 ? (
                   <div className="text-center py-20">
                     <p className="text-gray-300 mb-6">
-                      You haven’t enrolled in any courses yet
+                      No courses available yet
                     </p>
-                    <button
-                      onClick={() => navigate("/courses")}
-                      className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium"
-                    >
-                      Explore Courses
-                    </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -152,23 +168,23 @@ const Dashboard = () => {
 
           {/* RIGHT PANEL */}
           <div className="rounded-2xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 p-6">
-            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <h3 className="text-xl font-semibold mb-6">
               💡 {isTeacher ? "Instructor Tips" : "Quick Tips"}
             </h3>
             <ul className="space-y-4 text-gray-300 text-sm">
               {isTeacher ? (
                 <>
                   <li>• Create structured lessons</li>
-                  <li>• Keep course descriptions clear</li>
+                  <li>• Keep descriptions clear</li>
                   <li>• Update content regularly</li>
                   <li>• Engage with students</li>
                 </>
               ) : (
                 <>
-                  <li>• Review your notes regularly</li>
-                  <li>• Participate in discussions</li>
-                  <li>• Practice coding daily</li>
-                  <li>• Set learning goals</li>
+                  <li>• Review regularly</li>
+                  <li>• Participate actively</li>
+                  <li>• Practice daily</li>
+                  <li>• Stay consistent</li>
                 </>
               )}
             </ul>
@@ -179,7 +195,7 @@ const Dashboard = () => {
   );
 };
 
-/* ===== Small reusable components ===== */
+/* ---------- Reusable Components ---------- */
 
 const StatCard = ({ label, value, emoji }) => (
   <div className="rounded-2xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 px-6 py-5 flex justify-between items-center">
@@ -197,8 +213,13 @@ const CourseCard = ({ course, actionLabel, onClick }) => (
   <div className="rounded-xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 border border-white/10 backdrop-blur-xl overflow-hidden hover:scale-[1.02] transition">
     <div className="h-32 bg-gradient-to-br from-blue-500/30 to-purple-500/30"></div>
     <div className="p-4">
-      <h3 className="font-semibold mb-2">{course.title}</h3>
-      <p className="text-sm text-gray-300 mb-4">
+      <h3 className="font-semibold mb-2">
+        {course.title}
+      </h3>
+      <p className="text-sm text-gray-300 mb-2">
+        {course.instructor?.name}
+      </p>
+      <p className="text-sm text-gray-400 mb-4">
         {course.description?.slice(0, 60)}...
       </p>
       <button

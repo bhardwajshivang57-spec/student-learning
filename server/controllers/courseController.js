@@ -4,9 +4,6 @@ const Progress = require("../models/Progress");
 /* ======================================================
    CREATE COURSE
 ====================================================== */
-// @desc    Create a new course
-// @route   POST /api/courses
-// @access  Private
 const createCourse = async (req, res) => {
   try {
     const { title, description, price } = req.body;
@@ -33,9 +30,6 @@ const createCourse = async (req, res) => {
 /* ======================================================
    GET ALL PUBLISHED COURSES (PUBLIC)
 ====================================================== */
-// @desc    Get all published courses
-// @route   GET /api/courses
-// @access  Public
 const getAllCourses = async (req, res) => {
   try {
     const courses = await Course.find({ isPublished: true }).populate(
@@ -50,11 +44,28 @@ const getAllCourses = async (req, res) => {
 };
 
 /* ======================================================
+   GET SINGLE COURSE BY ID (🔥 NEW)
+====================================================== */
+const getCourseById = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id).populate(
+      "instructor",
+      "name email"
+    );
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ======================================================
    GET INSTRUCTOR'S OWN COURSES
 ====================================================== */
-// @desc    Get instructor's courses
-// @route   GET /api/courses/my
-// @access  Private
 const getMyCourses = async (req, res) => {
   try {
     const courses = await Course.find({
@@ -70,9 +81,6 @@ const getMyCourses = async (req, res) => {
 /* ======================================================
    PUBLISH COURSE
 ====================================================== */
-// @desc    Publish a course
-// @route   PUT /api/courses/:id/publish
-// @access  Private
 const publishCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -100,9 +108,6 @@ const publishCourse = async (req, res) => {
 /* ======================================================
    ENROLL COURSE + AUTO CREATE PROGRESS
 ====================================================== */
-// @desc    Enroll student in course
-// @route   POST /api/courses/:id/enroll
-// @access  Private
 const enrollCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -122,6 +127,7 @@ const enrollCourse = async (req, res) => {
     }
 
     const alreadyEnrolled = course.enrolledStudents.includes(req.user._id);
+
     if (alreadyEnrolled) {
       return res
         .status(400)
@@ -160,9 +166,6 @@ const enrollCourse = async (req, res) => {
 /* ======================================================
    STUDENT DASHBOARD – ENROLLED COURSES
 ====================================================== */
-// @desc    Get student's enrolled courses
-// @route   GET /api/courses/enrolled
-// @access  Private
 const getEnrolledCourses = async (req, res) => {
   try {
     const courses = await Course.find({
@@ -179,9 +182,6 @@ const getEnrolledCourses = async (req, res) => {
 /* ======================================================
    INSTRUCTOR DASHBOARD
 ====================================================== */
-// @desc    Instructor dashboard
-// @route   GET /api/courses/instructor/dashboard
-// @access  Private
 const instructorDashboard = async (req, res) => {
   try {
     const courses = await Course.find({
@@ -208,6 +208,7 @@ const instructorDashboard = async (req, res) => {
 module.exports = {
   createCourse,
   getAllCourses,
+  getCourseById,   
   getMyCourses,
   publishCourse,
   enrollCourse,

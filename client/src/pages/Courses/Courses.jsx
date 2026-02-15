@@ -18,7 +18,7 @@ export default function Courses() {
     getAllCourses({ query, sort, page })
       .then((data) => {
         if (mounted) {
-          setCourses(data?.courses || []);
+          setCourses(data || []);
         }
       })
       .catch((err) => {
@@ -99,9 +99,10 @@ export default function Courses() {
                   </h3>
 
                   <p className="text-sm text-gray-300">
-                    {course.instructor || "Instructor"} •{" "}
+                    {course.instructor?.name || "Instructor"} •{" "}
                     {course.duration || "Self paced"}
                   </p>
+
 
                   {course.features && (
                     <div className="flex flex-wrap gap-2 mt-3">

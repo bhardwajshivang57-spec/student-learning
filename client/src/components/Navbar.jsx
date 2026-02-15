@@ -35,6 +35,10 @@ export default function Navbar() {
               About Us
             </Link>
 
+            <Link to="/profile" className="hover:text-blue-600">
+              Profile
+            </Link>
+
             {/* STUDENT */}
             {user?.role === "student" && (
               <>

@@ -9,12 +9,16 @@ const {
   getMyCourses,
   enrollCourse,
   publishCourse,
+  getCourseById   // 👈 ADD THIS
 } = require("../controllers/courseController");
 
 const { protect } = require("../middleware/authMiddleware");
 
 // Public: get all published courses
 router.get("/", getAllCourses);
+
+// 🔥 ADD THIS ROUTE (VERY IMPORTANT)
+router.get("/:id", getCourseById);
 
 // Private: create new course
 router.post("/", protect, createCourse);
