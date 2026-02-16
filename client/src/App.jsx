@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Learn from "./pages/Learn/Learn";
 import Profile from "./pages/Profile/Profile";
 import CreateCourse from "./pages/CreateCourse/CreateCourse";
+import MyCourses from "./pages/student/MyCourses";
 
 /* 🔥 Separate wrapper to access auth loading state */
 function AppRoutes() {
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/:id" element={<CourseDetail />} />
+        <Route path="/my-courses" element={<MyCourses />} />
 
         {/* Protected Routes */}
         <Route

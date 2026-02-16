@@ -11,31 +11,41 @@ const Dashboard = () => {
   const isTeacher =
     user?.role === "teacher" || user?.role === "instructor";
 
- useEffect(() => {
-  const loadCourses = async () => {
-    try {
-      const data = await courseService.getAllCourses();
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        if (!user) return;
 
-      if (user?.role === "student") {
-        // only courses where student is enrolled
-        const enrolled = data.filter(course =>
-          course.enrolledStudents?.includes(user._id)
-        );
-        setCourses(enrolled);
-      } else {
-        // teacher sees their created courses
-        const created = data.filter(course =>
-          course.instructor?._id === user._id
-        );
-        setCourses(created);
+        let data = [];
+
+        if (user.role === "student") {
+          data = await courseService.getEnrolledCourses(user.token);
+        } else {
+          data = await courseService.getMyCourses(user.token);
+        }
+
+        setCourses(data || []);
+      } catch (error) {
+        console.error("DASHBOARD ERROR:", error);
       }
-    } catch (e) {
-      console.log(e);
+    };
+
+    loadCourses();
+  }, [user]);
+
+  const handlePublish = async (courseId) => {
+    try {
+      await courseService.publishCourse(courseId, user.token);
+      alert("Course published successfully 🚀");
+
+      // reload courses after publish
+      const updated = await courseService.getMyCourses(user.token);
+      setCourses(updated);
+    } catch (err) {
+      console.error(err);
+      alert("Publish failed");
     }
   };
-
-  loadCourses();
-}, [user]);
 
   return (
     <div
@@ -58,16 +68,12 @@ const Dashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <StatCard
-            label="Role"
-            value={user?.role}
-            emoji="🎓"
-          />
+          <StatCard label="Role" value={user?.role} emoji="🎓" />
           <StatCard
             label={
               isTeacher
                 ? "Total Courses Created"
-                : "Total Courses"
+                : "Courses Enrolled"
             }
             value={courses.length}
             emoji="📘"
@@ -106,46 +112,62 @@ const Dashboard = () => {
                     <p className="text-gray-300 mb-6">
                       You haven’t created any courses yet
                     </p>
-                    <Link
-                      to="/create-course"
-                      className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium"
-                    >
-                      Create Your First Course
-                    </Link>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {courses.map((course) => (
-                      <CourseCard
+                      <div
                         key={course._id}
-                        course={course}
-                        actionLabel="Manage Course"
-                        onClick={() =>
-                          navigate(`/courses/${course._id}`)
-                        }
-                      />
+                        className="rounded-xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 border border-white/10 backdrop-blur-xl p-4"
+                      >
+                        <h3 className="font-semibold mb-2">
+                          {course.title}
+                        </h3>
+
+                        <p className="text-sm text-gray-400 mb-3">
+                          {course.description?.slice(0, 60)}...
+                        </p>
+
+                        <button
+                          onClick={() =>
+                            navigate(`/courses/${course._id}`)
+                          }
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-md text-sm mb-2"
+                        >
+                          Manage Course
+                        </button>
+
+                        {!course.isPublished && (
+                          <button
+                            onClick={() =>
+                              handlePublish(course._id)
+                            }
+                            className="w-full bg-green-600 hover:bg-green-700 py-2 rounded-md text-sm"
+                          >
+                            Publish Course
+                          </button>
+                        )}
+
+                        {course.isPublished && (
+                          <div className="text-green-400 text-sm text-center mt-2">
+                            ✅ Published
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
               </>
             ) : (
               <>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">
-                    Explore Courses
-                  </h2>
-                  <button
-                    onClick={() => navigate("/courses")}
-                    className="text-sm text-blue-400 hover:underline"
-                  >
-                    Browse courses →
-                  </button>
-                </div>
+                <h2 className="text-xl font-semibold mb-6">
+                  Your Learning Courses
+                </h2>
 
                 {courses.length === 0 ? (
                   <div className="text-center py-20">
-                    <p className="text-gray-300 mb-6">
-                      No courses available yet
+                    <p className="text-gray-300">
+                      You haven’t enrolled in any course yet
                     </p>
                   </div>
                 ) : (
@@ -195,8 +217,6 @@ const Dashboard = () => {
   );
 };
 
-/* ---------- Reusable Components ---------- */
-
 const StatCard = ({ label, value, emoji }) => (
   <div className="rounded-2xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 backdrop-blur-xl border border-white/10 px-6 py-5 flex justify-between items-center">
     <div>
@@ -210,25 +230,17 @@ const StatCard = ({ label, value, emoji }) => (
 );
 
 const CourseCard = ({ course, actionLabel, onClick }) => (
-  <div className="rounded-xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 border border-white/10 backdrop-blur-xl overflow-hidden hover:scale-[1.02] transition">
-    <div className="h-32 bg-gradient-to-br from-blue-500/30 to-purple-500/30"></div>
-    <div className="p-4">
-      <h3 className="font-semibold mb-2">
-        {course.title}
-      </h3>
-      <p className="text-sm text-gray-300 mb-2">
-        {course.instructor?.name}
-      </p>
-      <p className="text-sm text-gray-400 mb-4">
-        {course.description?.slice(0, 60)}...
-      </p>
-      <button
-        onClick={onClick}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-md text-sm"
-      >
-        {actionLabel}
-      </button>
-    </div>
+  <div className="rounded-xl bg-gradient-to-br from-[#1b1f3b]/80 to-[#0f1224]/80 border border-white/10 backdrop-blur-xl p-4">
+    <h3 className="font-semibold mb-2">{course.title}</h3>
+    <p className="text-sm text-gray-400 mb-4">
+      {course.description?.slice(0, 60)}...
+    </p>
+    <button
+      onClick={onClick}
+      className="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-md text-sm"
+    >
+      {actionLabel}
+    </button>
   </div>
 );
 
