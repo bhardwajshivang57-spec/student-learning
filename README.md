@@ -1,176 +1,391 @@
-🎓 Student Learning Platform 
+🎓 SkillSpark Academy – Student Learning Platform
 
-A RESTful backend for a Student Learning Platform (LMS) built using Node.js, Express, MongoDB, and JWT Authentication.
-This backend handles authentication, course management, student enrollment, and progress tracking.
+A full-stack Learning Management System (LMS) built using React.js, Node.js, Express.js, MongoDB, and JWT Authentication.
 
-🚀 Features
+SkillSpark Academy is a learning platform where students can explore courses, enroll in courses, and track their learning progress. Instructors can create, manage, and publish courses.
+
+🔗 GitHub Repository
+
+View the complete project on GitHub
+
+🌐 Project Overview
+
+SkillSpark Academy is a full-stack web application with a separate frontend and backend maintained inside the same GitHub repository.
+
+👨‍🎓 Students can
+
+• Create an account
+
+• Login securely
+
+• Browse courses
+
+• Enroll in courses
+
+• View enrolled courses
+
+• Track learning progress
+
+• Mark lessons as completed
+
+👨‍🏫 Instructors can
+
+• Create courses
+
+• Manage courses
+
+• Publish / Unpublish courses
+
+• View course information
+
+• View course statistics
+ 
+✨ Features
+
 🔐 Authentication & Authorization
 
-User Registration & Login
+• User registration and login
 
-Password hashing using bcrypt
+• Password hashing using bcryptjs
 
-JWT-based authentication
+• JWT-based authentication
 
-Role-based access (Student / Instructor)
+• Protected routes
+
+• Role-based access control
+
+• Student and Instructor roles
 
 📚 Course Management
 
-Instructor can create courses
+• Create courses
 
-Publish / Unpublish courses
+• Manage courses
 
-Public API to fetch published courses
+• Publish / Unpublish courses
 
-Instructor dashboard with course stats
+• Browse published courses
 
-Students can enroll in courses
+• View course details
 
-👩‍🎓 Student Enrollment
-
-Secure course enrollment
-
-Prevent duplicate enrollments
-
-Fetch enrolled courses for students
+• Student course enrollment
 
 📈 Progress Tracking
 
-Auto-create progress on course enrollment
+• Automatic progress creation after enrollment
 
-Mark lessons as completed
+• Mark lessons as completed
 
-Progress percentage calculation
+• Track completed lessons
 
-Fetch progress for a specific course
+• Calculate course progress percentage
 
+• View progress for individual courses
+ 
 ⚠️ Error Handling
 
-Global error handling middleware
+• Global error handling middleware
 
-404 handling for invalid routes
+• 404 handling for invalid API routes
 
-Clean JSON error responses
+• Authentication and authorization error handling
+
+• Structured JSON error responses
+
+🎨 Frontend
+
+The frontend is built using React.js, Vite, Tailwind CSS, and React Router.
+
+Frontend includes
+
+Home / Landing Page
+
+Login & Registration
+
+Student Dashboard
+
+Instructor Dashboard
+
+Course Browsing
+
+Course Enrollment
+
+Progress Tracking
+
+Protected Routes
+
+Responsive UI
+
+⚙️ Backend
+
+The backend is built using Node.js and Express.js.
+
+It provides REST APIs for:
+
+Authentication
+
+Authorization
+
+Course Management
+
+Course Enrollment
+
+Progress Tracking
+
+MongoDB is used as the database with Mongoose for database operations.
 
 🛠️ Tech Stack
+
+Frontend
+
+React.js
+
+Vite
+
+JavaScript
+
+Tailwind CSS
+
+React Router
+
+Backend
 
 Node.js
 
 Express.js
 
-MongoDB + Mongoose
+MongoDB
 
-JWT (jsonwebtoken)
+Mongoose
+
+JWT
 
 bcryptjs
 
 dotenv
 
-Postman (for API testing)
+Tools
 
-📁 Folder Structure
-server/
-│
-├── config/
-│   └── db.js
-│
-├── controllers/
-│   ├── authController.js
-│   ├── courseController.js
-│   └── progressController.js
-│
-├── middleware/
-│   ├── authMiddleware.js
-│   └── errorMiddleware.js
-│
-├── models/
-│   ├── User.js
-│   ├── Course.js
-│   └── Progress.js
-│
-├── routes/
-│   ├── authRoutes.js
-│   ├── courseRoutes.js
-│   └── progressRoutes.js
-│
-├── .env
-├── server.js
-└── package.json
+Git
 
-⚙️ Environment Variables
+GitHub
 
-Create a .env file in the server folder:
+Postman
+
+MongoDB Compass
+
+VS Code
+
+📁 Project Structure
+
+student-learning-platform/
+│
+├── client/
+│   ├── public/
+│   ├── src/
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── server.js
+│   └── package.json
+│
+├── .gitignore
+└── README.md
+
+🔗 API Endpoints
+
+Authentication
+
+POST /api/auth/register
+POST /api/auth/login
+
+Courses
+
+GET  /api/courses
+POST /api/courses
+POST /api/courses/:id/enroll
+
+Progress
+
+POST /api/progress/complete
+GET  /api/progress/:courseId
+
+Protected APIs require:
+
+Authorization: Bearer <JWT_TOKEN>
+
+⚙️ Installation & Setup
+
+Prerequisites
+
+Node.js
+
+npm
+
+MongoDB
+
+Git
+
+1. Clone the Repository
+
+git clone https://github.com/bhardwajshivang57-spec/student-learning.git
+cd student-learning
+
+2. Backend Setup
+
+cd server
+npm install
+npm run dev
+
+Backend runs on:
+
+http://localhost:5000
+
+3. Frontend Setup
+
+Open a new terminal:
+
+cd client
+npm install
+npm run dev
+
+Frontend runs on:
+
+http://localhost:5173
+
+🔑 Environment Variables
+
+Create a .env file inside the server folder:
 
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 NODE_ENV=development
 
-▶️ How to Run the Backend
-1️⃣ Install dependencies
-npm install
+⚠️ Never upload the actual .env file or MongoDB credentials to GitHub.
 
-2️⃣ Start the server
-npm run dev
+Your .gitignore should contain:
 
-
-Server will run on:
-
-http://localhost:5000
+node_modules/
+.env
+dist/
 
 🧪 API Testing
 
-All APIs were tested using Postman.
+The backend APIs were tested using Postman.
 
-Example APIs:
+Testing included:
 
-POST /api/auth/register
+Registration
 
-POST /api/auth/login
+Login
 
-GET /api/courses
+JWT authentication
 
-POST /api/courses/:id/enroll
+Course creation
 
-POST /api/progress/complete
+Course retrieval
 
-GET /api/progress/:courseId
+Course enrollment
 
-Protected routes require:
+Progress tracking
 
-Authorization: Bearer <JWT_TOKEN>
+Protected routes
+
+Error handling
 
 🧠 Learning Outcomes
 
-Built a real-world LMS backend
+This project provided practical experience in:
 
-Understood JWT authentication flow
+Full-stack web development
 
-Learned MongoDB relationships & population
+React.js
 
-Implemented progress tracking logic
+REST API development
 
-Debugged and handled real backend edge cases
+JWT authentication
 
-📌 Future Enhancements (Optional)
+Role-based authorization
 
-Lesson & Video models
+MongoDB & Mongoose
 
-Payment integration
+Frontend-backend integration
 
-Admin dashboard
+Course management
+
+Student enrollment
+
+Progress tracking
+
+Error handling
+
+Git & GitHub
+
+🚀 Future Enhancements
+
+Video-based lessons
+
+Online quizzes
 
 Course reviews & ratings
 
-Pagination & search
+Payment integration
 
-👤 Author
+Course search & filtering
+
+Certificates
+
+Notifications
+
+Admin dashboard
+
+Advanced analytics
+
+👨‍💻 Author
 
 Shivang Bhardwaj
-📧 Email: bhardwajshivang57@gmail.com
 
-💻 Backend Developer | MERN Stack Learner
+B.Tech CSE – Data Science
 
-⭐ Final Note
+Skills: React.js • JavaScript • Node.js • Express.js • MongoDB • Full-Stack Development
 
-This backend is fully functional, scalable, and resume-ready, built with proper architecture and best practices.
+⭐ Project Highlights
+
+SkillSpark Academy demonstrates a complete full-stack Learning Management System with:
+
+Modern React frontend
+
+Node.js & Express backend
+
+MongoDB database
+
+JWT authentication
+
+Role-based authorization
+
+Course management
+
+Student enrollment
+
+Learning progress tracking
+
+REST APIs
+
+Responsive user interface
+
+📌 Project Objective
+
+The objective of SkillSpark Academy is to provide a structured digital learning platform where students can:
+
+Discover → Enroll → Learn → Track Progress
+
+while instructors can create and manage educational courses.
