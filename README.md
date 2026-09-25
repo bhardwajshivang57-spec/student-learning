@@ -1,4 +1,4 @@
-🎓 Student Learning Platform – Backend
+🎓 Student Learning Platform 
 
 A RESTful backend for a Student Learning Platform (LMS) built using Node.js, Express, MongoDB, and JWT Authentication.
 This backend handles authentication, course management, student enrollment, and progress tracking.
